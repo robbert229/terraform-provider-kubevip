@@ -18,27 +18,37 @@ func dataPodManifest() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"interface": {
 				Description: "Name of the interface to bind to",
+				Required:    true,
 				Type:        schema.TypeString,
 			},
 			"controlplane": {
 				Description: "Enable HA for control plane",
+				Optional:    true,
+				Default:     false,
 				Type:        schema.TypeBool,
 			},
 			"address": {
 				Description: "an address (IP or DNS name) to use as a VIP",
 				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"services": {
 				Description: "Enable Kubernetes services",
 				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"leader_election": {
 				Description: "Use the Kubernetes leader election mechanism for clustering",
 				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"arp": {
 				Description: "Enable Arp for VIP changes",
 				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 
 			"raw_yaml": {
