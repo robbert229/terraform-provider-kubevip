@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/robbert229/terraform-provider-kubevip/internal/provider"
 )
 
@@ -34,13 +36,14 @@ func main() {
 	flag.BoolVar(&debugMode, "debug", false, "set to true to run the provider with support for debuggers like delve")
 	flag.Parse()
 
-	opts := &plugin.ServeOpts{
+	opts := providerserver.ServeOpts{
 		Debug: debugMode,
 
-		ProviderAddr: ProviderAddr,
-
-		ProviderFunc: provider.New(version),
+		Address: "registery.terraform.io/robbert229/kubevip",
 	}
 
-	plugin.Serve(opts)
+	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }

@@ -3,44 +3,50 @@ package provider
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
-const Name = "kubevip"
+const kubevipVersion = "v0.6.3"
 
-func New(version string) func() *schema.Provider {
-	return func() *schema.Provider {
-		return &schema.Provider{
-			Schema:               providerSchema(),
-			ResourcesMap:         providerResources(),
-			DataSourcesMap:       providerDataSources(),
-			ConfigureContextFunc: configure(),
+// kubevip is the provider implementation.
+type kubevipProvider struct {
+	version string
+}
+
+func New(version string) func() provider.Provider {
+	return func() provider.Provider {
+		return &kubevipProvider{
+			version: version,
 		}
 	}
 }
 
-type Provider struct {
+// Metadata returns the provider type name.
+func (p *kubevipProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "kubevip"
+	resp.Version = p.version
 }
 
-func init() {
-	// Set descriptions to support markdown syntax
-	schema.DescriptionKind = schema.StringMarkdown
+// Schema defines the provider-level schema for configuration data.
+func (p *kubevipProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
+	resp.Schema = schema.Schema{}
 }
 
-func providerResources() map[string]*schema.Resource {
-	return map[string]*schema.Resource{}
+// Configure prepares a HashiCups API client for data sources and resources.
+func (p *kubevipProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 }
 
-func providerDataSources() map[string]*schema.Resource {
-	return map[string]*schema.Resource{
-		"kubevip_pod_manifest":       dataPodManifest(),
-		"kubevip_daemonset_manifest": dataDaemonSetManifest(),
+// DataSources defines the data sources implemented in the provider.
+func (p *kubevipProvider) DataSources(_ context.Context) []func() datasource.DataSource {
+	return []func() datasource.DataSource{
+		NewManifestDataSource,
 	}
 }
 
-func configure() schema.ConfigureContextFunc {
-	return func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-		return &Provider{}, nil
-	}
+// Resources defines the resources implemented in the provider.
+func (p *kubevipProvider) Resources(_ context.Context) []func() resource.Resource {
+	return nil
 }
