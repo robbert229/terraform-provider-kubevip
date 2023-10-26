@@ -29,13 +29,13 @@ func init() {
 }
 
 func providerResources() map[string]*schema.Resource {
-	return map[string]*schema.Resource{
-		resourceARPManifest: buildResourceARPManifest(),
-	}
+	return map[string]*schema.Resource{}
 }
 
 func providerDataSources() map[string]*schema.Resource {
-	return map[string]*schema.Resource{}
+	return map[string]*schema.Resource{
+		"kubevip_pod_manifest": dataPodManifest(),
+	}
 }
 
 func configure() schema.ConfigureContextFunc {

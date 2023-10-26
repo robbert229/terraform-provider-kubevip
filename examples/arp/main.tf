@@ -13,10 +13,11 @@ provider "kubevip" {
 
 # deploy arp manifest
 
-resource "kubevip_arp_manifest" "manifest" {
+data "kubevip_pod_manifest" "manifest" {
   interface       = "ens192"
   address         = "192.168.0.40"
-  controlplan     = true
+  controlplane    = true
   services        = true
-  leader-election = true
+  leader_election = true
+  arp             = true
 }
