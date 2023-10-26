@@ -34,7 +34,7 @@ func providerResources() map[string]*schema.Resource {
 
 func providerDataSources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
-		"kubevip_pod_manifest": dataPodManifest(),
+		"kubevip_pod_manifest":       dataPodManifest(),
 		"kubevip_daemonset_manifest": dataDaemonSetManifest(),
 	}
 }
