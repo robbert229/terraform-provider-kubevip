@@ -9,12 +9,10 @@ import (
 	"github.com/kube-vip/kube-vip/pkg/kubevip"
 )
 
-const version = "v0.6.3"
-
-func dataPodManifest() *schema.Resource {
+func dataDaemonSetManifest() *schema.Resource {
 	return &schema.Resource{
-		Description: "`kubevip_pod_manifest` generates a static pod manifest for kubevip.",
-		ReadContext: dataPodManifestRead,
+		Description: "`kubevip_daemonset_manifest` generates a static pod manifest for kubevip.",
+		ReadContext: dataDaemonSetManifestRead,
 		Schema: map[string]*schema.Schema{
 			"interface": {
 				Description: "Name of the interface to bind to",
@@ -50,6 +48,18 @@ func dataPodManifest() *schema.Resource {
 				Optional:    true,
 				Default:     false,
 			},
+			"taint": {
+				Description: "Taint the manifest for only running on control planes",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+			},
+			"in_cluster": {
+				Description: "Use the incluster token to authenticate to Kubernetes",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+			},
 
 			"raw_yaml": {
 				Description: "The resulting yaml",
@@ -60,7 +70,7 @@ func dataPodManifest() *schema.Resource {
 	}
 }
 
-func dataPodManifestRead(ctx context.Context, d *schema.ResourceData, i interface{}) diag.Diagnostics {
+func dataDaemonSetManifestRead(ctx context.Context, d *schema.ResourceData, i interface{}) diag.Diagnostics {
 
 	initConfig := kubevip.Config{
 		Interface:          d.Get("interface").(string),
@@ -85,9 +95,10 @@ func dataPodManifestRead(ctx context.Context, d *schema.ResourceData, i interfac
 		return diag.FromErr(fmt.Errorf("no address is specified for kube-vip to expose services on"))
 	}
 
-	inCluster := false
+	inCluster := d.Get("in_cluster").(bool)
+	taint := d.Get("taint").(bool)
 
-	cfg := kubevip.GeneratePodManifestFromConfig(&initConfig, version, inCluster)
+	cfg := kubevip.GenerateDaemonsetManifestFromConfig(&initConfig, version, inCluster, taint)
 
 	address := d.Get("address").(string)
 
